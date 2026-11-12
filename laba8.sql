@@ -110,7 +110,15 @@ WHERE EXISTS (
     WHERE oi.order_id = o.order_id AND p.price > 100000
 );
 
-SELECT full_name -- 7 задание
+SELECT DISTINCT c.full_name -- 7 задание (LEFT JOIN)
+FROM Customers c
+LEFT JOIN Orders o ON c.customer_id = o.customer_id
+LEFT JOIN Order_Items oi ON o.order_id = oi.order_id
+LEFT JOIN Products p ON oi.product_id = p.product_id AND p.product_name = 'Ноутбук'
+WHERE p.product_id IS NULL;
+
+
+SELECT full_name -- 7 задание (NOT IN)
 FROM Customers
 WHERE customer_id NOT IN (
     SELECT o.customer_id
@@ -134,12 +142,29 @@ FULL OUTER JOIN Orders o ON c.customer_id = o.customer_id
 FULL OUTER JOIN Order_Items oi ON o.order_id = oi.order_id
 FULL OUTER JOIN Products p ON oi.product_id = p.product_id;
 
-SELECT c.full_name -- 10 задание
+SELECT c.full_name -- 10 задание (JOIN)
 FROM Customers c
 JOIN Orders o ON c.customer_id = o.customer_id
 JOIN Order_Items oi ON o.order_id = oi.order_id
 JOIN Products p ON oi.product_id = p.product_id
 WHERE p.price = (SELECT MAX(price) FROM Products);
+
+SELECT full_name -- 10 задание (только подзапросы) 
+FROM Customers
+WHERE customer_id IN (
+    SELECT customer_id
+    FROM Orders
+    WHERE order_id IN (
+        SELECT order_id
+        FROM Order_Items
+        WHERE product_id IN (
+            SELECT product_id
+            FROM Products
+            WHERE price = (SELECT MAX(price) FROM Products)
+        )
+    )
+);
+
 
 SELECT DISTINCT -- 11 задание
     c.full_name,
